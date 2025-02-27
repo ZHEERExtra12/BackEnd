@@ -260,7 +260,7 @@ app.post("/sell-item", async (req, res) => {
             [finalQuantity, finalTotalPrice, finalProfit]);
 
         
-        
+        //T@P.P$:s7eTD@Pi
        return res.status(200).json("success")
         
     }
@@ -296,6 +296,5 @@ app.get("/get-profit", async(req,res) => {
 
 })
 
-app.listen("3000",()=>{
-    console.log("server is runing ")
-})
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
