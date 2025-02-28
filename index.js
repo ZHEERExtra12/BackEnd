@@ -68,39 +68,40 @@ app.post("/register",async(req,res)=>{
     }
 })
 
-app.post("/login", async(req,res)=>{
-    const {username, password}=req.body
+app.post("/login", async (req, res) => {
+    const { username, password } = req.body;
 
-    if(!username || !password) return res.status(404).json({message:"نابێ خانەکان بەتاڵ بن"});
+    if (!username || !password) return res.status(404).json({ message: "نابێ خانەکان بەتاڵ بن" });
 
-    try{
-    const selectAcc = "SELECT * FROM users WHERE username=?"
-   const [rows] = await db.promise().query(selectAcc,[username])
+    try {
+        const selectAcc = "SELECT * FROM users WHERE username=?";
+        const [rows] = await db.promise().query(selectAcc, [username]);
 
-    if(rows.length===0) return res.status(400).json({message:"ئەم هەژمارە بونی نیە"});
+        if (rows.length === 0) return res.status(400).json({ message: "ئەم هەژمارە بونی نیە" });
 
-    const isMatch  = await bcrypt.compare(password,rows[0].password)
-    
-    if(!isMatch){
-        return res.status(404).json({message:"پاسوردەکە هەڵەیە"})
+        const isMatch = await bcrypt.compare(password, rows[0].password);
+        console.log(isMatch); // Log if password matches
+
+        if (!isMatch) {
+            return res.status(404).json({ message: "پاسوردەکە هەڵەیە" });
+        }
+
+        const token =await jwt.sign({ username }, jwt_secret, { expiresIn: "1h" });
+        console.log(token);  // Log the generated token
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 60 * 1000,
+        });
+
+        res.status(200).json({ message: "سەرکەرتوو بوو" });
+    } catch (err) {
+        console.log(err);  // Log any errors during login
+        res.status(500).json({ message: "SERVER ERROR" });
     }
-
-    const token = jwt.sign({username},jwt_secret,{expiresIn:"1h"})
-    res.cookie("token",token,{
-        httpOnly:true,
-        sameSite:"strict",
-         secure: process.env.NODE_ENV === "production",
-        maxAge:60*60*1000
-    })
-
-    res.status(200).json({message:"سەرکەرتوو بوو"})
-    }
-    catch{
-        res.status(500).json({message:"SERVER ERROR"})
-
-    }
-
-})
+});
 
 app.get("/protected", (req,res)=>{
     const token = req.cookies.token
