@@ -73,6 +73,7 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
+  console.log("Login attempt for:", username);
 
   if (!username || !password) {
     return res.status(400).json({ message: "نابێ خانەکان بەتاڵ بن" });
@@ -91,18 +92,21 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ message: "پاسوردەکە هەڵەیە" });
     }
 
+    console.log("Creating token for:", username);
+    console.log("JWT Secret exists:", !!jwt_secret);
     const token = await jwt.sign({ username }, jwt_secret, { expiresIn: "1h" });
+    console.log("Token created:", token ? "success" : "failed");
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "none",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "none", // Changed from "strict" to "none" for cross-site
+      secure: true, // Always use secure in production
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.status(200).json({ message: "سەرکەرتوو بوو" });
   } catch (err) {
-    console.error(err); // Log the error for debugging
+    console.error("Login error:", err); // Enhanced error logging
     res.status(500).json({ message: "SERVER ERROR" });
   }
 });
@@ -129,7 +133,8 @@ app.post("/logout", async (req, res) => {
   try {
     await res.clearCookie("token", {
       httpOnly: true,
-      sameSite:"none",
+      sameSite: "none", // Changed to match login cookie setting
+      secure: true,     // Changed to match login cookie setting
       path: "/",
     });
     res.status(200).json({ message: "successful" });
@@ -141,6 +146,10 @@ app.post("/logout", async (req, res) => {
 
 app.get("/getusername", async (req, res) => {
   const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+  
   try {
     const decode = jwt.verify(token, jwt_secret);
     const username = decode.username;
@@ -148,7 +157,7 @@ app.get("/getusername", async (req, res) => {
       username: username,
     });
   } catch (err) {
-    console.error(err); // Log the error for debugging
+    console.error("Error getting username:", err); // Enhanced error logging
     res.status(500).json("SERVER ERROR");
   }
 });
