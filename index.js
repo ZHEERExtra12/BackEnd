@@ -21,7 +21,7 @@ app.use(express.json())
 const DB_HOST = process.env.DB_HOST
 const DB_USER = process.env.DB_USER
 const DB_PASSWORD = process.env.DB_PASSWORD
-const jwt_secret = process.env.JWT_SECRET
+const jwt_secret = "zh@@zh@@net$$net$$"
 const DB_NAME = process.env.DB_NAME
 
 const db = mysql.createConnection({
@@ -88,7 +88,7 @@ app.post("/login", async (req, res) => {
             return res.status(404).json({ message: "پاسوردەکە هەڵەیە" });
         }
 
-        const token =await jwt.sign({ username }, jwt_secret, { expiresIn: "1h" });
+        const token =jwt.sign({ username }, jwt_secret, { expiresIn: "1h" });
         
 
         res.cookie("token", token, {
