@@ -95,7 +95,7 @@ app.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "none",
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 1000, // 1 hour
     });
@@ -129,7 +129,7 @@ app.post("/logout", async (req, res) => {
   try {
     await res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite:"none",
       path: "/",
     });
     res.status(200).json({ message: "successful" });
