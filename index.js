@@ -3,7 +3,7 @@ import mysql from "mysql2"
 import dotenv from "dotenv"
 import jwt from "jsonwebtoken"
 import cors from "cors"
-import bcrypt from "bcryptjsheroku buildpacks:add heroku/python"
+import bcrypt from 'bcryptjs';
 import cookieParser from "cookie-parser"
 const app =express()
 dotenv.config()
