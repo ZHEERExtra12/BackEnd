@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser"
 const app =express()
 dotenv.config()
 app.use(cors(
-    {origin: "http://localhost:5173",
+    {origin: "https://pharmacy-hewr.netlify.app",
         credentials: true
     }
 ))
